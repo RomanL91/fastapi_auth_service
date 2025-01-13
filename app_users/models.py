@@ -40,6 +40,8 @@ class ClientUUID(Base):
 class User(Base):
     """Модель пользователя"""
 
+    __tablename__ = "users"
+
     username: Mapped[str | None] = mapped_column(
         String,
         unique=True,

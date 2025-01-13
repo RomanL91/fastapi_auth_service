@@ -1,8 +1,6 @@
-from datetime import datetime
-
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, ForeignKey, DateTime, func, text
+from sqlalchemy import String, ForeignKey, DateTime, text
 
 from core.BASE_model import Base
 
@@ -18,11 +16,13 @@ class SMSCode(Base):
         String(6),
         nullable=False,
     )  # Сам код (например, 6-значный)
-    expires_at: Mapped[datetime] = mapped_column(
+    expires_at: Mapped[DateTime] = mapped_column(
         DateTime,
-        server_default=(func.now() + text("INTERVAL '5 MINUTE")),
+        server_default=text(
+            "NOW() + INTERVAL '5 MINUTE'"
+        ),  # Устанавливаем значение по умолчанию на уровне базы данных
         nullable=False,
-    )  # Время истечения кода, через 5 минут после создания
+    )  # Время истечения кода
     is_used: Mapped[bool] = mapped_column(
         default=False,
         nullable=False,

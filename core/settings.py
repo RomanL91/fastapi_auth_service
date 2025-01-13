@@ -108,7 +108,9 @@ BASE_DIR = Path(__file__).parent.parent
 
 
 class SettingsDataBase(BaseModel):
-    url: str = f"sqlite+aiosqlite:///{BASE_DIR}/db.sqlite3"
+    url: str = (
+        "postgresql+asyncpg://MyauthUser:MyauthPassword@localhost:4444/MyauthDataBase"
+    )
     echo: bool = True  # Для дебага
 
 
