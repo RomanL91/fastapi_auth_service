@@ -1,5 +1,9 @@
 from abc import ABC, abstractmethod
+from random import randint
+
 from core.BASE_unit_of_work import UnitOfWork
+
+from app_sms.models import SMSCode
 from app_phone_numbers.schemas import PhoneNumberResponse
 
 
@@ -11,6 +15,19 @@ class PhoneNumberStrategy(ABC):
         Должен возвращать объект PhoneNumberResponse с ID телефонного номера.
         """
         pass
+
+    async def _create_sms_code(self, uow: UnitOfWork, user_id: str) -> SMSCode:
+        """
+        Базовый метод, который:
+        1) Генерирует 6-значный код (с ведущими нулями)
+        2) Создаёт запись SMSCode в БД
+        3) Возвращает созданную запись SMSCode
+        """
+        # Генерируем код вида "0123" (всегда 4 цифр, даже если < 10000)
+        generated_code = f"{randint(0, 9999):04d}"
+
+        sms_code = await uow.sms.create_obj(user_id=user_id, code=generated_code)
+        return sms_code
 
 
 class ExistingPhoneStrategy(PhoneNumberStrategy):
@@ -24,6 +41,11 @@ class ExistingPhoneStrategy(PhoneNumberStrategy):
             phone_record = await uow.phone.get_obj(phone_number=phone_number)
             if not phone_record:
                 raise ValueError(f"Phone number {phone_number} not found")
+
+            # Создаём SMS-код для этого пользователя
+            sms_code = await self._create_sms_code(uow, user_id=phone_record.user_id)
+            # Сохраняем изменения
+            await uow.commit()
             return PhoneNumberResponse(id=phone_record.id)
 
 
@@ -41,6 +63,8 @@ class NewPhoneStrategy(PhoneNumberStrategy):
             new_phone_record = await uow.phone.create_obj(
                 phone_number=phone_number, user_id=new_user.id
             )
+            # И тут создаём SMS-код для этого пользователя
+            sms_code = await self._create_sms_code(uow, user_id=new_user.id)
             # Фиксируем изменения
             await uow.commit()
 
