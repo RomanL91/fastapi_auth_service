@@ -1,40 +1,12 @@
 from typing import List
 from datetime import datetime
 
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import String, ForeignKey, DateTime
+from sqlalchemy import String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.BASE_model import Base
 
 DEFAULT_AVATAR_PATH = "avatar_default.png"
-
-
-class ClientUUID(Base):
-    """Модель для хранения UUID, генерируемых на клиенте"""
-
-    user_id: Mapped[UUID | None] = mapped_column(
-        ForeignKey("users.id"),
-        nullable=True,
-    )  # Пользователь (если авторизован)
-    client_uuid: Mapped[str] = mapped_column(
-        String,
-        unique=True,
-        nullable=False,
-    )  # UUID от клиента
-    ip_address: Mapped[str | None] = mapped_column(
-        String,
-        nullable=True,
-    )  # IP-адрес пользователя
-    device_type: Mapped[str | None] = mapped_column(
-        String,
-        nullable=True,
-    )  # Тип устройства (например, desktop, mobile)
-
-    user: Mapped["User | None"] = relationship(  # type: ignore
-        "User",
-        back_populates="client_uuids",
-    )
 
 
 class User(Base):
