@@ -36,7 +36,7 @@ class JWToken(Base):
         nullable=False,
     )  # Тип токена (ACCESS/REFRESH)
     token: Mapped[str] = mapped_column(
-        String(200),
+        String(600),
         nullable=False,
     )  # Токен в виде строки
     revoked: Mapped[bool] = mapped_column(
