@@ -1,6 +1,7 @@
 import os
 
-# from pytz import timezone as tz
+from pytz import timezone as tz
+
 # from dotenv import load_dotenv
 
 from pathlib import Path
@@ -17,17 +18,17 @@ BASE_DIR = Path(__file__).parent.parent
 # load_dotenv()  # какой-то не красивый вызов... TODO
 
 
-# class SettingsAuth(BaseModel):
-#     private_key_path: Path = BASE_DIR / "certs" / "private.pem"
-#     public_key_path: Path = BASE_DIR / "certs" / "public.pem"
-#     algorithm: str = "RS256"
-#     token_type: str = "Bearer"
-#     token_type_field: str = "type"
-#     access_token_type: str = "access_token"
-#     refresh_token_type: str = "refresh_token"
-#     access_token_expire: int = 5  # 5 min
-#     refresh_token_expire: int = 60 * 24 * 30  # 30 days
-#     timezone: tz = tz("Asia/Almaty")
+class SettingsAuth(BaseModel):
+    private_key_path: Path = BASE_DIR / "certs" / "private.pem"
+    public_key_path: Path = BASE_DIR / "certs" / "public.pem"
+    algorithm: str = "RS256"
+    token_type: str = "Bearer"
+    token_type_field: str = "type"
+    access_token_type: str = "access_token"
+    refresh_token_type: str = "refresh_token"
+    access_token_expire: int = 5  # 5 min
+    refresh_token_expire: int = 60 * 24 * 30  # 30 days
+    timezone: tz = tz("Asia/Almaty")
 
 
 # class SettingGoogleAuth(BaseModel):
@@ -114,19 +115,19 @@ class SettingsDataBase(BaseModel):
     echo: bool = True  # Для дебага
 
 
-# class SettingsCORSMiddleware(BaseModel):
-#     origins: list[str] = [
-#         "http://localhost",
-#         "http://localhost:3000",
-#         "http://localhost:8000",
-#     ]
-#     middleware: dict = {
-#         "middleware_class": CORSMiddleware,
-#         "allow_origins": origins,
-#         "allow_credentials": True,
-#         "allow_methods": ["*"],
-#         "allow_headers": ["*"],
-#     }
+class SettingsCORSMiddleware(BaseModel):
+    origins: list[str] = [
+        "http://localhost",
+        "http://localhost:3000",
+        "http://localhost:8000",
+    ]
+    middleware: dict = {
+        "middleware_class": CORSMiddleware,
+        "allow_origins": origins,
+        "allow_credentials": True,
+        "allow_methods": ["*"],
+        "allow_headers": ["*"],
+    }
 
 
 class Settings(BaseSettings):
@@ -137,13 +138,13 @@ class Settings(BaseSettings):
     # == DataBase
     db: SettingsDataBase = SettingsDataBase()
     # == Auth
-    # auth_jwt: SettingsAuth = SettingsAuth()
+    auth_jwt: SettingsAuth = SettingsAuth()
     # # == Google Auth
     # google_auth: SettingGoogleAuth = SettingGoogleAuth()
     # # == VK Auth
     # vk_auth: SettingVKAuth = SettingVKAuth()
     # # == CORSMiddleware
-    # middleware: SettingsCORSMiddleware = SettingsCORSMiddleware()
+    middleware: SettingsCORSMiddleware = SettingsCORSMiddleware()
 
 
 settings = Settings()
