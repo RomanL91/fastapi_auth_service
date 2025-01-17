@@ -2,7 +2,7 @@ import os
 
 from pytz import timezone as tz
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -13,9 +13,9 @@ from pydantic_settings import BaseSettings
 from fastapi.middleware.cors import CORSMiddleware
 
 
-BASE_DIR = Path(__file__).parent.parent
+load_dotenv()  # загрузка переменных окружения
 
-# load_dotenv()  # какой-то не красивый вызов... TODO
+BASE_DIR = Path(__file__).parent.parent
 
 
 class SettingsAuth(BaseModel):
@@ -31,36 +31,35 @@ class SettingsAuth(BaseModel):
     timezone: tz = tz("Asia/Almaty")
 
 
-# class SettingGoogleAuth(BaseModel):
-#     # TODO .env
-#     google_client_id: str = os.getenv("GOOGLE_CLIENT_ID")
-#     google_client_secret: str = os.getenv("GOOGLE_CLIENT_SECRET")
-#     google_redirect_url: str = os.getenv("GOOGLE_REDIRECT_URL")
-#     # google_redirect_url: str = "https://https://google_oauth2_test.serveo.net/auth_api/v1/auth_user/auth/google"
-#     google_token_url: str = os.getenv("GOOGLE_TOKEN_URL")
-#     google_user_info_url: str = os.getenv("GOOGLE_USER_INFO_URL")
-#     _data_post: dict = {
-#         "code": None,
-#         "client_id": google_client_id,
-#         "client_secret": google_client_secret,
-#         "redirect_uri": google_redirect_url,
-#         "grant_type": "authorization_code",
-#     }
-#     headers: dict = {"Authorization": None}
+class SettingGoogleAuth(BaseModel):
+    # TODO .env
+    google_client_id: str = os.getenv("GOOGLE_CLIENT_ID")
+    google_client_secret: str = os.getenv("GOOGLE_CLIENT_SECRET")
+    google_redirect_url: str = os.getenv("GOOGLE_REDIRECT_URL")
+    google_token_url: str = os.getenv("GOOGLE_TOKEN_URL")
+    google_user_info_url: str = os.getenv("GOOGLE_USER_INFO_URL")
+    _data_post: dict = {
+        "code": None,
+        "client_id": google_client_id,
+        "client_secret": google_client_secret,
+        "redirect_uri": google_redirect_url,
+        "grant_type": "authorization_code",
+    }
+    headers: dict = {"Authorization": None}
 
-#     # Геттер для data_post
-#     @property
-#     def data_post(self):
-#         return self._data_post
+    # Геттер для data_post
+    @property
+    def data_post(self):
+        return self._data_post
 
-#     # Сеттер для data_post
-#     @data_post.setter
-#     def data_post(self, values: dict):
-#         self._data_post.update(values)
+    # Сеттер для data_post
+    @data_post.setter
+    def data_post(self, values: dict):
+        self._data_post.update(values)
 
-#     def get_headers(self, access_token):
-#         self.headers.update({"Authorization": f"Bearer {access_token}"})
-#         return self.headers
+    def get_headers(self, access_token):
+        self.headers.update({"Authorization": f"Bearer {access_token}"})
+        return self.headers
 
 
 # class SettingVKAuth(BaseModel):
@@ -131,7 +130,6 @@ class SettingsCORSMiddleware(BaseModel):
 
 
 class Settings(BaseSettings):
-
     # == Other
     api_v1_prefix: str = "/auth_api/v1"
     time_zone: ZoneInfo = ZoneInfo("Asia/Almaty")
@@ -140,7 +138,7 @@ class Settings(BaseSettings):
     # == Auth
     auth_jwt: SettingsAuth = SettingsAuth()
     # # == Google Auth
-    # google_auth: SettingGoogleAuth = SettingGoogleAuth()
+    google_auth: SettingGoogleAuth = SettingGoogleAuth()
     # # == VK Auth
     # vk_auth: SettingVKAuth = SettingVKAuth()
     # # == CORSMiddleware
