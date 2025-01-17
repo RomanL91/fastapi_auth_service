@@ -71,3 +71,26 @@ class JWTService:
             "access": access_token_schema,
             "refresh": refresh_token_schema,
         }
+
+    async def create_and_store_access(
+        self,
+        **kwargs,
+    ):
+        payload_access = dict(kwargs)
+        access_token_schema: JWTSchema = self.jwt_util.encode_jwt(payload_access)
+
+        async with self.uow as uow:
+            # Сохраняем ACCESS-токен
+            await uow.jwt.create_obj(
+                user_id=access_token_schema.user_id,
+                token=access_token_schema.token,
+                token_type=access_token_schema.token_type,  # Enum TokenTypeEnum.ACCESS
+                expires_at=access_token_schema.expires_at,
+                issued_at=access_token_schema.issued_at,
+                revoked=False,
+            )
+            await uow.commit()
+
+        return {
+            "access": access_token_schema,
+        }
