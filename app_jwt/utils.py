@@ -1,6 +1,8 @@
 import jwt
 import uuid
 
+from typing import TYPE_CHECKING
+
 from datetime import datetime, timedelta, timezone
 
 # == Exceptions
@@ -9,8 +11,9 @@ from fastapi import HTTPException, status
 # == Core
 from core.settings import SettingsAuth
 
-# == Schema
-from app_jwt.schemas import JWTSchema
+if TYPE_CHECKING:
+    # == Schema
+    from app_jwt.schemas import JWTSchema
 
 
 class JWTUtil:
@@ -27,7 +30,7 @@ class JWTUtil:
         self.access_token_type = settings.access_token_type
         self.refresh_token_type = settings.refresh_token_type
 
-    def encode_jwt(self, payload: dict) -> JWTSchema:
+    def encode_jwt(self, payload: dict) -> "JWTSchema":
         # now = datetime.now(self.timezone)
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         expire = now + timedelta(minutes=self.access_token_expire)
@@ -37,6 +40,8 @@ class JWTUtil:
         token_value = jwt.encode(
             payload=payload, key=self.private_key, algorithm=self.algorithm
         )
+        from app_jwt.schemas import JWTSchema  # Локальный импорт TODO эт конечно п..ц.
+
         token = JWTSchema(
             user_id=self.convet_str_to_uuid(payload.get("user_id")),
             issued_at=now,
