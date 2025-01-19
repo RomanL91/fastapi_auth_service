@@ -5,6 +5,10 @@ from typing import TYPE_CHECKING
 
 from datetime import datetime, timedelta, timezone
 
+from fastapi import Request, HTTPException
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+
 # == Exceptions
 from fastapi import HTTPException, status
 
@@ -58,14 +62,14 @@ class JWTUtil:
             return jwt.decode(jwt_key, key=self.public_key, algorithms=[self.algorithm])
         except jwt.ExpiredSignatureError:
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired."
             )
         except jwt.InvalidTokenError as e:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
         except Exception as e:
             # Для любых других JWT ошибок
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT token"
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid JWT token."
             )
 
     def convet_str_to_uuid(self, user_id: str):
@@ -73,3 +77,40 @@ class JWTUtil:
 
 
 jwt_util = JWTUtil(settings=SettingsAuth())
+
+
+class JWTBearer(HTTPBearer):
+    def __init__(self, expected_token_type: str, auto_error: bool = True):
+        super().__init__(auto_error=auto_error)
+        self.expected_token_type = expected_token_type
+
+    async def __call__(self, request: Request) -> str | None:
+        credentials: HTTPAuthorizationCredentials = await super().__call__(request)
+        if credentials:
+            if credentials.scheme.lower() != "bearer":
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Invalid authentication scheme.",
+                )
+            payload_data = self.verify_jwt(credentials.credentials)
+            return payload_data
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Invalid authorization code.",
+            )
+
+    def verify_jwt(self, jwtoken: str) -> dict:
+        try:
+            payload_data = jwt_util.decode_jwt(jwtoken)
+        except HTTPException as e:
+            raise HTTPException(
+                status_code=e.status_code,
+                detail=e.detail,
+            )
+        if payload_data.get("type") == self.expected_token_type:
+            return payload_data
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid token type.",
+        )
