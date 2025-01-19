@@ -1,8 +1,17 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from typing import Annotated
+
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from app_phone_numbers import utils
+
+
+class PhoneNumberSchema(BaseModel):
+    number: Annotated[str, Field(...)]
+    # Дополнительные поля при необходимости
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PhoneNumberRequest(BaseModel):
