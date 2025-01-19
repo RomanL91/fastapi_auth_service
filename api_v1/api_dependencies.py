@@ -1,13 +1,17 @@
 from typing import Annotated
 from fastapi import Depends
 
+from core.settings import settings
 from core.BASE_unit_of_work import IUnitOfWork, UnitOfWork
 
-# from social_acc_app.schemas import CodeFromGoogle, ParamsFormVK
-# from sms_app.schemas import SMSCOdeSchemaForm
+from app_jwt.utils import JWTBearer
 
+
+access_token_scheme = JWTBearer(expected_token_type=settings.auth_jwt.access_token_type)
+refresh_token_scheme = JWTBearer(
+    expected_token_type=settings.auth_jwt.refresh_token_type
+)
 
 UOF_Depends = Annotated[IUnitOfWork, Depends(UnitOfWork)]
-# CodeFromGoogle_Depends = Annotated[CodeFromGoogle, Depends(CodeFromGoogle)]
-# ParamsVK_Depends = Annotated[ParamsFormVK, Depends(ParamsFormVK)]
-# SMSCode_Depends = Annotated[SMSCOdeSchemaForm, Depends(SMSCOdeSchemaForm)]
+Access_JWT_Depends = Annotated[str, Depends(access_token_scheme)]
+Refresh_JWT_Depends = Annotated[str, Depends(refresh_token_scheme)]
