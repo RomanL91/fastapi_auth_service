@@ -1,6 +1,7 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy.engine import Result
+from sqlalchemy import select, update
 from sqlalchemy.orm import selectinload
 
 from core.BASE_repository import SQLAlchemyRepository
@@ -24,8 +25,10 @@ class UserRepository(SQLAlchemyRepository):
         stmt = (
             select(User)
             .options(
-                selectinload(User.phone),  # Загрузка связи PhoneNumber
-                selectinload(User.social_accounts),  # Загрузка связи SocialAccount
+                selectinload(self.model.phone),  # Загрузка связи PhoneNumber
+                selectinload(
+                    self.model.social_accounts
+                ),  # Загрузка связи SocialAccount
                 # selectinload(User.tokens),  # Загрузка связи JWToken
                 # selectinload(User.sms_codes),  # Загрузка связи SMSCode
             )
@@ -34,3 +37,22 @@ class UserRepository(SQLAlchemyRepository):
         result = await self.session.execute(stmt)
         user = result.scalar_one_or_none()
         return user
+
+    async def update_user(self, obj_id: str, **data) -> User | None:
+        from sqlalchemy.orm import selectinload
+
+        stmt = (
+            update(self.model)
+            .options(
+                selectinload(self.model.phone),  # Загрузка связи PhoneNumber
+                selectinload(self.model.social_accounts),
+            )
+            .values(**data)
+            .filter_by(id=obj_id)
+            .returning(self.model)
+        )
+        res: Result = await self.session.execute(stmt)
+        updated_obj = res.scalar_one_or_none()
+        if updated_obj is None:
+            raise ValueError(f"Object with id={obj_id} not found")
+        return updated_obj
