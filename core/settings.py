@@ -131,6 +131,9 @@ class SettingsCORSMiddleware(BaseModel):
 
 class Settings(BaseSettings):
     # == Other
+    # avatar_directory: str = "uploads/avatars"
+    avatar_directory: Path = BASE_DIR / "uploads/avatars"
+    avatar_url: str = "/static/avatars"
     api_v1_prefix: str = "/auth_api/v1"
     time_zone: ZoneInfo = ZoneInfo("Asia/Almaty")
     # == DataBase
