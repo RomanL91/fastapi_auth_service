@@ -18,3 +18,23 @@ class UserSchema(BaseModel):
     social_accounts: Annotated[List[SocialAccountSchema], Field(default_factory=list)]
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserUpdateSchema(BaseModel):
+    username: Annotated[str | None, Field(default=None)]
+    avatar_path: Annotated[str | None, Field(default=None)]
+    email: Annotated[EmailStr | None, Field(default=None)]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserAvatarSchema(BaseModel):
+    avatar_path: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description="Path to user's avatar",
+        ),
+    ]
+
+    model_config = ConfigDict(from_attributes=True)
