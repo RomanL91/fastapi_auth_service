@@ -16,7 +16,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token/")
 
 
 @router.get(
-    "/login/google/",
+    "/login/google",
     status_code=status.HTTP_200_OK,
     summary="Получить ссылку на авторизацию через Google.",
 )
