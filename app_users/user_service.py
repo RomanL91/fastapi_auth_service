@@ -9,9 +9,9 @@ from fastapi import Request, UploadFile, HTTPException, status
 from core.settings import settings
 from core.BASE_unit_of_work import UnitOfWork
 
-from app_users.models import User
+from app_users.models import User, UserAddress
 
-from app_users.schemas import UserUpdateSchema, UserSchema
+from app_users.schemas import UserUpdateSchema, UserSchema, UserAddressSchema
 
 
 class UserService:
@@ -84,3 +84,22 @@ class UserService:
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to upload avatar. \n -> {e}",
             )
+
+    async def create_user_address(
+        self, user_id: str, address_data: UserAddressSchema
+    ) -> UserAddress | None:
+        """
+            Создаст пльзователю адресс.
+
+        Args:
+            user_id (UUID): Идентификатор пользователя.
+            address_data (UserAddressSchema): Данные адреса.
+
+        Returns:
+            Optional[UserAddress]: Объект адреса пользователя или None, если не найден.
+        """
+        data = address_data.model_dump()
+        async with self.uow as uow:
+            user_address = await uow.address.create_obj(user_id=user_id, **data)
+            await uow.commit()
+            return user_address
