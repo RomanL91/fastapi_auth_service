@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from core.BASE_repository import SQLAlchemyRepository
 
-from app_users.models import User
+from app_users.models import User, UserAddress
 
 
 class UserRepository(SQLAlchemyRepository):
@@ -29,6 +29,8 @@ class UserRepository(SQLAlchemyRepository):
                 selectinload(
                     self.model.social_accounts
                 ),  # Загрузка связи SocialAccount
+                selectinload(self.model.addresses),
+                # selectinload(self.model.points_balances),
                 # selectinload(User.tokens),  # Загрузка связи JWToken
                 # selectinload(User.sms_codes),  # Загрузка связи SMSCode
             )
@@ -39,13 +41,14 @@ class UserRepository(SQLAlchemyRepository):
         return user
 
     async def update_user(self, obj_id: str, **data) -> User | None:
-        from sqlalchemy.orm import selectinload
 
         stmt = (
             update(self.model)
             .options(
                 selectinload(self.model.phone),  # Загрузка связи PhoneNumber
                 selectinload(self.model.social_accounts),
+                selectinload(self.model.addresses),
+                selectinload(self.model.points_balances),
             )
             .values(**data)
             .filter_by(id=obj_id)
@@ -56,3 +59,7 @@ class UserRepository(SQLAlchemyRepository):
         if updated_obj is None:
             raise ValueError(f"Object with id={obj_id} not found")
         return updated_obj
+
+
+class UserAddressRepository(SQLAlchemyRepository):
+    model = UserAddress
