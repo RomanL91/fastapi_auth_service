@@ -4,7 +4,7 @@ from core.DB_manager import db_manager
 
 from app_jwt.jwt_repository import JWTokenRepository
 from app_sms.sms_repository import SMSCodeRepository
-from app_users.users_repository import UserRepository
+from app_users.users_repository import UserRepository, UserAddressRepository
 from app_phone_numbers.phone_num_repository import PhoneNumberRepository
 from app_phone_numbers.phone_num_repository import PhoneNumberRepository
 from app_social_account.soc_acc_repository import SocialAccountRepository
@@ -39,6 +39,7 @@ class UnitOfWork:
         self.user = UserRepository(self.session)
         self.phone = PhoneNumberRepository(self.session)
         self.social_acc = SocialAccountRepository(self.session)
+        self.address = UserAddressRepository(self.session)
         return self
 
     async def __aexit__(self, *args):
