@@ -49,6 +49,12 @@ async def get_user_info(
 
 @router.patch(
     "/update",
+    status_code=status.HTTP_200_OK,
+    response_model=UserSchema,
+    summary="Обновить информацию о пользователе.",
+    description="""
+        **Через данный endpoint можно обновить информацию о пользователе.** <br>
+    """,
 )
 async def update_user_info(
     user_update: UserUpdateSchema,
