@@ -69,6 +69,14 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
     )
+    wishlist_items: Mapped[list["WishlistItem"]] = relationship(  # type: ignore
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    vieved_products: Mapped[list["ViewedProduct"]] = relationship(  # type: ignore
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 
 
 class UserAddress(Base):
