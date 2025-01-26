@@ -9,6 +9,8 @@ __all__ = (
     "SocialAccount",
     "UserPointsBalance",
     "UserPointsTransaction",
+    "WishlistItem",
+    "ViewedProduct",
 )
 
 
@@ -21,3 +23,4 @@ from app_sms.models import SMSCode
 from app_phone_numbers.models import PhoneNumber
 from app_social_account.models import SocialAccount
 from app_bonus_points.models import UserPointsBalance, UserPointsTransaction
+from app_wishlist_Items.models import WishlistItem, ViewedProduct
