@@ -30,6 +30,8 @@ class UserRepository(SQLAlchemyRepository):
                     self.model.social_accounts
                 ),  # Загрузка связи SocialAccount
                 selectinload(self.model.addresses),
+                selectinload(self.model.wishlist_items),
+                selectinload(self.model.vieved_products),
                 # selectinload(self.model.points_balances),
                 # selectinload(User.tokens),  # Загрузка связи JWToken
                 # selectinload(User.sms_codes),  # Загрузка связи SMSCode
