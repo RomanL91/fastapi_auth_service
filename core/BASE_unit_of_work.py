@@ -8,6 +8,10 @@ from app_users.users_repository import UserRepository, UserAddressRepository
 from app_phone_numbers.phone_num_repository import PhoneNumberRepository
 from app_phone_numbers.phone_num_repository import PhoneNumberRepository
 from app_social_account.soc_acc_repository import SocialAccountRepository
+from app_wishlist_Items.wishlistitems_repository import (
+    WishlistItemRepository,
+    ViewedProductRepository,
+)
 
 
 class IUnitOfWork(ABC):
@@ -40,6 +44,8 @@ class UnitOfWork:
         self.phone = PhoneNumberRepository(self.session)
         self.social_acc = SocialAccountRepository(self.session)
         self.address = UserAddressRepository(self.session)
+        self.wishlist = WishlistItemRepository(self.session)
+        self.viewed = ViewedProductRepository(self.session)
         return self
 
     async def __aexit__(self, *args):
