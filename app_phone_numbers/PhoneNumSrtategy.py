@@ -6,8 +6,12 @@ from core.BASE_unit_of_work import UnitOfWork
 from app_sms.models import SMSCode
 from app_phone_numbers.schemas import PhoneNumberResponse
 
+from app_phone_numbers.smsc_api import SMSC
+
 
 class PhoneNumberStrategy(ABC):
+    sms = SMSC()
+
     @abstractmethod
     async def execute(self, uow: UnitOfWork, phone_number: str) -> PhoneNumberResponse:
         """
@@ -16,7 +20,7 @@ class PhoneNumberStrategy(ABC):
         """
         pass
 
-    async def _create_sms_code(self, uow: UnitOfWork, user_id: str) -> SMSCode:
+    async def _create_sms_msg(self, uow: UnitOfWork, user_id: str) -> SMSCode:
         """
         Базовый метод, который:
         1) Генерирует 6-значный код (с ведущими нулями)
@@ -25,9 +29,9 @@ class PhoneNumberStrategy(ABC):
         """
         # Генерируем код вида "0123" (всегда 4 цифр, даже если < 10000)
         generated_code = f"{randint(0, 9999):04d}"
-
+        msg = f"Код авторизации: {generated_code} SCK-1.KZ"  # TODO вынести в настройки
         sms_code = await uow.sms.create_obj(user_id=user_id, code=generated_code)
-        return sms_code
+        return msg
 
 
 class ExistingPhoneStrategy(PhoneNumberStrategy):
@@ -42,10 +46,16 @@ class ExistingPhoneStrategy(PhoneNumberStrategy):
             if not phone_record:
                 raise ValueError(f"Phone number {phone_number} not found")
 
-            # Создаём SMS-код для этого пользователя
-            sms_code = await self._create_sms_code(uow, user_id=phone_record.user_id)
+            # Создаём SMS для этого пользователя
+            sms_msg = await self._create_sms_msg(uow, user_id=phone_record.user_id)
             # Сохраняем изменения
             await uow.commit()
+            # Отправка
+            self.sms.send_sms(
+                phones=phone_number,
+                message=sms_msg,
+                sender="sms",
+            )
             return PhoneNumberResponse(id=phone_record.id)
 
 
@@ -64,10 +74,15 @@ class NewPhoneStrategy(PhoneNumberStrategy):
                 phone_number=phone_number, user_id=new_user.id
             )
             # И тут создаём SMS-код для этого пользователя
-            sms_code = await self._create_sms_code(uow, user_id=new_user.id)
+            sms_msg = await self._create_sms_msg(uow, user_id=new_user.id)
             # Фиксируем изменения
             await uow.commit()
-
+            # Отправка
+            self.sms.send_sms(
+                phones=phone_number,
+                message=sms_msg,
+                sender="sms",
+            )
             return PhoneNumberResponse(id=new_phone_record.id)
 
 
