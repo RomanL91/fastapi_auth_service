@@ -5,6 +5,7 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 from app_social_account.schemas import SocialAccountSchema
 from app_phone_numbers.schemas import PhoneNumberSchema
+from app_wishlist_Items.schemas import WishlistItemRead, VievedProductsRead
 
 
 class UserAddressSchema(BaseModel):
@@ -38,6 +39,8 @@ class UserSchema(BaseModel):
     phone: Annotated[PhoneNumberSchema | None, Field(default=None)]
     social_accounts: Annotated[List[SocialAccountSchema], Field(default_factory=list)]
     addresses: Annotated[List[UserAddressSchema], Field(default_factory=list)]
+    wishlist_items: Annotated[List[WishlistItemRead], Field(default_factory=list)]
+    vieved_products: Annotated[List[VievedProductsRead], Field(default_factory=list)]
 
     model_config = ConfigDict(from_attributes=True)
 
