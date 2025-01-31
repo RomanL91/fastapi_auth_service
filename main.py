@@ -21,11 +21,16 @@ app.mount(
 
 @app.get("/")
 async def start_test():
-    return {"message": "1, 2, 3 Start!"}
+    return {"message": "1, 2, 3 Start! Service Auth V2!"}
 
 
 if __name__ == "__main__":
     os.makedirs(
         settings.avatar_directory, exist_ok=True
     )  # Убедитесь, что директория существует
-    uvicorn.run("main:app", host="0.0.0.0", port=8999, reload=True)
+    uvicorn.run(
+        "main:app",
+        host=settings.host,
+        port=settings.port,
+        reload=settings.reload_serv,
+    )
