@@ -8,7 +8,7 @@ from app_phone_numbers import utils
 
 
 class PhoneNumberSchema(BaseModel):
-    number: Annotated[str, Field(...)]
+    phone_number: Annotated[str, Field(...)]
     # Дополнительные поля при необходимости
 
     model_config = ConfigDict(from_attributes=True)
