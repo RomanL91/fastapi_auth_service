@@ -8,7 +8,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -107,11 +107,19 @@ class SettingGoogleAuth(BaseModel):
 #         return self._information_post_request_to_obtain_user_data
 
 
-class SettingsDataBase(BaseModel):
-    url: str = (
-        "postgresql+asyncpg://MyauthUser:MyauthPassword@localhost:4444/MyauthDataBase"
-    )
+class SettingsDataBase(BaseSettings):
+    # model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    DB_USER: str = os.getenv("DB_USER", "MyauthUser")
+    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "MyauthPassword")
+    DB_HOST: str = os.getenv("DB_HOST", "localhost")
+    DB_PORT: int = os.getenv("DB_PORT", 4444)
+    DB_NAME: str = os.getenv("DB_NAME", "MyauthDataBase")
+
     echo: bool = True  # Для дебага
+
+    @property
+    def url(self) -> str:
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 
 class SettingsCORSMiddleware(BaseModel):
@@ -130,6 +138,10 @@ class SettingsCORSMiddleware(BaseModel):
 
 
 class Settings(BaseSettings):
+    # setting server running
+    host: str = os.getenv("HOST")
+    port: int = os.getenv("PORT")
+    reload_serv: bool = os.getenv("RELOAD")
     # == Other
     avatar_directory: Path = BASE_DIR / "uploads/avatars"
     avatar_url: str = "/static/avatars"
