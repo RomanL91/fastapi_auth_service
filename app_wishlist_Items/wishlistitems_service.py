@@ -23,6 +23,7 @@ class ItemsService:
                     client_uuid=item_data.client_uuid,
                     user_id=item_data.user_id,
                     product_id=item_data.product_id,
+                    is_active=item_data.is_active,
                 )
                 if item_data.user_id:
                     item.user_id = item_data.user_id
