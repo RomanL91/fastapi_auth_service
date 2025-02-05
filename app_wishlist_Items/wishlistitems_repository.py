@@ -18,6 +18,7 @@ class WishlistItemRepository(SQLAlchemyRepository):
         product_id: int,
         client_uuid: UUID | None = None,
         user_id: UUID | None = None,
+        is_active: bool | None = None,
     ):
         # Построение условий поиска с использованием OR
         or_conditions = []
@@ -40,6 +41,7 @@ class WishlistItemRepository(SQLAlchemyRepository):
             product_id=product_id,
             client_uuid=client_uuid,
             user_id=user_id,
+            is_active=is_active,
         )
         return item
 
