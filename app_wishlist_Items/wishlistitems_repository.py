@@ -35,13 +35,14 @@ class WishlistItemRepository(SQLAlchemyRepository):
         wishlist_item = result.scalar_one_or_none()
 
         if wishlist_item:
+            if is_active:
+                wishlist_item.is_active = is_active
             return wishlist_item
 
         item = await self.create_obj(
             product_id=product_id,
             client_uuid=client_uuid,
             user_id=user_id,
-            is_active=is_active,
         )
         return item
 
