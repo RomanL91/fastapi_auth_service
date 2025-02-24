@@ -63,7 +63,7 @@ async def update_user_info(
 ):
     user_id = token.get("user_id", None)
     if user_id:
-        # Инициализируем сервис и вызываем метод `get_user_info`
+        # Инициализируем сервис и вызываем метод `update_user_info`
         user_service = UserService(uow=uow)
         updated_user = await user_service.update_user_info(user_id, user_update)
         return UserSchema.model_validate(updated_user)

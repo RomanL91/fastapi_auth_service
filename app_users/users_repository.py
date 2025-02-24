@@ -50,7 +50,9 @@ class UserRepository(SQLAlchemyRepository):
                 selectinload(self.model.phone),  # Загрузка связи PhoneNumber
                 selectinload(self.model.social_accounts),
                 selectinload(self.model.addresses),
-                selectinload(self.model.points_balances),
+                selectinload(self.model.points_balance),
+                selectinload(self.model.wishlist_items),
+                selectinload(self.model.vieved_products),
             )
             .values(**data)
             .filter_by(id=obj_id)
