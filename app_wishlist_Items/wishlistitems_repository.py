@@ -82,16 +82,17 @@ class ViewedProductRepository(SQLAlchemyRepository):
         deltatime_min: int | None = 30,
     ):
         # Рассчитываем время отсечки TODO (фигня со временем)
-        cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=deltatime_min)
-
+        # cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=deltatime_min)
+        print("----------------- IN DA HAUSE -----------------")
         # Построение условий поиска с использованием OR
         or_conditions = []
         if client_uuid:
+            print(f"--- if client_uuid --- > {client_uuid}")
             or_conditions.append(self.model.client_uuid == client_uuid)
         if user_id:
+            print(f"--- if user_id --- > {user_id}")
             or_conditions.append(self.model.user_id == user_id)
-        if not or_conditions:
-            return None
+        print(f"--- or_conditions --- > {or_conditions}")
 
         # Конструируем запрос с OR условиями
         stmt = select(self.model).where(
@@ -100,9 +101,12 @@ class ViewedProductRepository(SQLAlchemyRepository):
             # self.model.created_at >= cutoff_time.replace(tzinfo=None),
         )
         result: Result = await self.session.execute(stmt)
+        print(f"--- result --- > {result}")
         item: ViewedProduct | None = result.scalar_one_or_none()
+        print(f"--- item --- > {item}")
 
         if item:
+            print(f"--- if item --- > {item}")
             item.updated_at = datetime.now(timezone.utc)
             await self.session.commit()  # или await self.session.commit() flush()
             await self.session.refresh(item)  # получить актуальные данные
@@ -113,6 +117,7 @@ class ViewedProductRepository(SQLAlchemyRepository):
             client_uuid=client_uuid,
             user_id=user_id,
         )
+        print(f"--- irem --- > {irem}")
         return irem
 
     async def get_all_objs_by(
