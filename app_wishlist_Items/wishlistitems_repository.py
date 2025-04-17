@@ -90,23 +90,22 @@ class ViewedProductRepository(SQLAlchemyRepository):
             or_conditions.append(self.model.client_uuid == client_uuid)
         if user_id:
             or_conditions.append(self.model.user_id == user_id)
+        if not or_conditions:
+            return None
 
         # Конструируем запрос с OR условиями
-        stmt = (
-            update(self.model)
-            .where(
-                self.model.product_id == product_id,
-                or_(*or_conditions),
-                self.model.created_at >= cutoff_time.replace(tzinfo=None),
-            )
-            .values(updated_at=datetime.now(timezone.utc))
-            .execution_options(synchronize_session="fetch")
+        stmt = select(self.model).where(
+            self.model.product_id == product_id,
+            or_(*or_conditions),
+            self.model.created_at >= cutoff_time.replace(tzinfo=None),
         )
-
         result: Result = await self.session.execute(stmt)
-        wishlist_item = result.scalars().all()
+        item: ViewedProduct | None = result.scalar_one_or_none()
 
-        if wishlist_item:
+        if item:
+            item.updated_at = datetime.now(timezone.utc)
+            await self.session.flush()  # или await self.session.commit()
+            await self.session.refresh(item)  # получить актуальные данные
             return None
 
         irem = await self.create_obj(
