@@ -108,8 +108,8 @@ class ViewedProductRepository(SQLAlchemyRepository):
         if item:
             print(f"--- if item --- > {item}")
             item.updated_at = datetime.now(timezone.utc)
-            await self.session.commit()  # или await self.session.commit() flush()
-            await self.session.refresh(item)  # получить актуальные данные
+            await self.session.flush()  # или await self.session.commit() flush()
+            # await self.session.refresh(item)  # получить актуальные данные
             return None
 
         irem = await self.create_obj(
