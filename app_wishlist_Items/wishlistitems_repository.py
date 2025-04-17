@@ -2,7 +2,7 @@ from uuid import UUID
 
 from datetime import datetime, timedelta, timezone
 
-from sqlalchemy import select, or_
+from sqlalchemy import select, update, or_
 from sqlalchemy.engine import Result
 
 from core.BASE_repository import SQLAlchemyRepository
@@ -92,11 +92,16 @@ class ViewedProductRepository(SQLAlchemyRepository):
             or_conditions.append(self.model.user_id == user_id)
 
         # Конструируем запрос с OR условиями
-        stmt = select(self.model).where(
-            self.model.product_id == product_id,
-            or_(*or_conditions),
-            self.model.created_at >= cutoff_time.replace(tzinfo=None),
+        stmt = (
+            update(self.model)
+            .where(
+                self.model.product_id == product_id,
+                or_(*or_conditions),
+                self.model.created_at >= cutoff_time.replace(tzinfo=None),
+            )
+            .values(updated_at=datetime.now(timezone.utc))
         )
+
         result: Result = await self.session.execute(stmt)
         wishlist_item = result.scalars().all()
 
