@@ -97,7 +97,7 @@ class ViewedProductRepository(SQLAlchemyRepository):
         stmt = select(self.model).where(
             self.model.product_id == product_id,
             or_(*or_conditions),
-            self.model.created_at >= cutoff_time.replace(tzinfo=None),
+            # self.model.created_at >= cutoff_time.replace(tzinfo=None),
         )
         result: Result = await self.session.execute(stmt)
         item: ViewedProduct | None = result.scalar_one_or_none()
