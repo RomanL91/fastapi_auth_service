@@ -127,7 +127,7 @@ class ViewedProductRepository(SQLAlchemyRepository):
         stmt = (
             select(self.model)
             .where(self.model.is_active == True, or_(*or_conditions))
-            .order_by(self.model.created_at)
+            .order_by(self.model.updated_at)
             .limit(50)
         )
         result: Result = await self.session.execute(stmt)
