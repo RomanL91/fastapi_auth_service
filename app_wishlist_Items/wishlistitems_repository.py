@@ -100,6 +100,7 @@ class ViewedProductRepository(SQLAlchemyRepository):
                 self.model.created_at >= cutoff_time.replace(tzinfo=None),
             )
             .values(updated_at=datetime.now(timezone.utc))
+            .execution_options(synchronize_session="fetch")
         )
 
         result: Result = await self.session.execute(stmt)
