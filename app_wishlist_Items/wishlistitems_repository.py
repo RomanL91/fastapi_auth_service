@@ -104,7 +104,7 @@ class ViewedProductRepository(SQLAlchemyRepository):
 
         if item:
             item.updated_at = datetime.now(timezone.utc)
-            await self.session.flush()  # или await self.session.commit()
+            await self.session.commit()  # или await self.session.commit() flush()
             await self.session.refresh(item)  # получить актуальные данные
             return None
 
